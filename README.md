@@ -10,7 +10,7 @@ This project sets up a Python application with MinIO using Docker Compose. The P
 
 ## Setup
 
-1. Clone the repository:
+1. Clone the repository:  -> TODO Ilias: This they can figure out on their own.
 
     ```sh
     git clone <repository-url>
@@ -34,6 +34,7 @@ This project sets up a Python application with MinIO using Docker Compose. The P
     pytest = "^7.0"
     pytest-mock = "^3.6.1"
     ```
+-> TODO Ilias: I have added the pyproject.toml already. 
 
 3. Create a `poetry.lock` file by running:
 
@@ -42,13 +43,20 @@ This project sets up a Python application with MinIO using Docker Compose. The P
     poetry lock
     cd ..
     ```
+-> TODO Ilias: In the taskfile setup this is not needed. 
 
 4. Install dependencies:
 
     ```sh
     make install
-    ```
+       ```
+-> TODO Ilias: In the taskfile setup this is not needed. 
 
 ## Usage
 
-### Start the services
+### Verify the Project
+
+```commandline
+task all
+```
+-> TODO Ilias: Replace with makefile if you want. But if you want to use make, please keep all my linters, formatters, and tests. And the separated .venve environmentms.  
