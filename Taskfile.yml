@@ -196,3 +196,4 @@ tasks:
       - task: build
       - task: run
       - task: logs
+      - task: down
