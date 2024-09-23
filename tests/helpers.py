@@ -1,16 +1,11 @@
 from __future__ import annotations
 
 import io
-import uuid
 
 import minio
 
 
-def uuid4() -> str:
-    return uuid.uuid4().hex
-
-
-def write_same_data_to_files(
+def write_data_to_files(
         minio_client: minio.Minio,
         bucket_name: str,
         data: bytes,

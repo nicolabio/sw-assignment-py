@@ -24,6 +24,9 @@ class Config(BaseSettings):
     # Mode of the output.
     mode: Mode = Field(default=Mode.STDOUT)
 
+    # Files are filtered by this prefix.
+    prefix: str = Field(default="")
+
     # Output path.
     #
     # Only used when mode is JSON.

@@ -1,4 +1,4 @@
-from typing import Iterable, Tuple
+from sys import prefix
 
 import minio
 import pytest
@@ -9,32 +9,12 @@ from sw_assignment.storage import (
     NotFoundError,
     StorageReader,
 )
-from tests.helpers import uuid4, write_same_data_to_files
+from tests.helpers import write_data_to_files
 
 
 @pytest.fixture
 def storage_reader(minio_client: minio.Minio, bucket_name: str) -> StorageReader:
     return StorageReader(minio_client, bucket_name)
-
-
-@pytest.fixture
-def write_dummy_data_to_bucket(minio_client: minio.Minio, bucket_name: str) -> Tuple[int, int, str]:
-    """Write files to the bucket with a random prefix.
-
-    Returns:
-        int: The number of files written.
-        int: Length of each file.
-        str: Prefix of each file.
-    """
-    # num_files is an arbitrary number of files to write.
-    # It's worth keeping the number of files small to keep the test fast.
-    num_files = 3
-    prefix = uuid4()
-    data = b"dummy data"
-    out_file_names = [f"{prefix}/{i}.txt" for i in range(num_files)]
-
-    write_same_data_to_files(minio_client, bucket_name, data, out_file_names)
-    return num_files, len(data), prefix
 
 
 class TestStorageReader:
@@ -43,63 +23,80 @@ class TestStorageReader:
         with pytest.raises(NoSuchBucket):
             StorageReader(minio_client, "none-existing-bucket")
 
+    @pytest.mark.parametrize(
+        "prefix", ["", "prefix/"],
+    )
     def test_iter_file_infos__happy_flow(
             self,
             storage_reader: StorageReader,
-            write_dummy_data_to_bucket: Tuple[int, int, str],
+            minio_client: minio.Minio,
+            bucket_name: str,
+            data: bytes,
+            prefix: str,
     ) -> None:
-        # Init bucket with dummy data.
-        num_files, len_data, prefix = write_dummy_data_to_bucket
+        # Seed the bucket.
+        files_to_write = [
+            f"{prefix}file1.txt",
+            f"{prefix}file2.dcm",
+            f"{prefix}file3.dcm",
+        ]
+        write_data_to_files(minio_client, bucket_name, data, files_to_write)
+        file_infos = [FileInfo(path=f, size=len(data)) for f in files_to_write]
 
         # Create iterator.
-        file_infos = storage_reader.iter_file_infos(prefix)
+        iterator = storage_reader.iter_file_infos(prefix=prefix)
+        # Read the iterator.
+        got = [file_info for file_info in iterator]
 
-        # Iterate of iterator and verify all properties.
-        self.verify_file_infos(file_infos, num_files, len_data, prefix)
+        want = file_infos
+        assert got == want
 
+    @pytest.mark.parametrize(
+        "prefix", ["", "prefix/"],
+    )
     def test_list_file_infos__happy_flow(
             self,
             storage_reader: StorageReader,
-            write_dummy_data_to_bucket: Tuple[int, int, str],
+            minio_client: minio.Minio,
+            bucket_name: str,
+            data: bytes,
+            prefix: str,
     ) -> None:
-        # Init bucket with dummy data.
-        num_files, len_data, prefix = write_dummy_data_to_bucket
+        # Seed the bucket.
+        files_to_write = [
+            f"{prefix}file1.txt",
+            f"{prefix}file2.dcm",
+            f"{prefix}file3.dcm",
+        ]
+        write_data_to_files(minio_client, bucket_name, data, files_to_write)
+        file_infos = [FileInfo(path=f, size=len(data)) for f in files_to_write]
 
         # No min or max files specified, we expect all files.
-        file_infos = storage_reader.list_file_infos(prefix)
-        self.verify_file_infos(file_infos, num_files, len_data, prefix)
+        got = storage_reader.list_file_infos(prefix=prefix)
+        want = file_infos   # We expect all.
+        assert got == want
 
         # Specify max files more than there are, we expect all files.
-        file_infos = storage_reader.list_file_infos(prefix, min_files=2, max_files=4)
-        self.verify_file_infos(file_infos, num_files, len_data, prefix)
+        got = storage_reader.list_file_infos(prefix=prefix, min_files=2, max_files=4)
+        want = file_infos  # We expect all.
+        assert got == want
 
         # Specify max files less than there are, we expect not all files.
-        file_infos = storage_reader.list_file_infos(prefix, min_files=1, max_files=2)
-        self.verify_file_infos(file_infos, 2, len_data, prefix)
+        got = storage_reader.list_file_infos(prefix=prefix, min_files=1, max_files=2)
+        want = file_infos[:2]  # We expect only the first two.
+        assert got == want[:2]
 
     def test_list_file_infos__raises_not_found_error_if_not_min_files(
             self,
             storage_reader: StorageReader,
-            write_dummy_data_to_bucket: Tuple[int, int, str],
+            minio_client: minio.Minio,
+            bucket_name: str,
     ) -> None:
-        # Init bucket with dummy data.
-        num_files, len_data, prefix = write_dummy_data_to_bucket
+        # Seed the bucket.
+        files_to_write = [
+            "file1.txt",
+        ]
+        write_data_to_files(minio_client, bucket_name, b"dummy", files_to_write)
 
         with pytest.raises(NotFoundError):
             storage_reader.list_file_infos(prefix, min_files=1002)
-
-    @staticmethod
-    def verify_file_infos(
-            file_infos: Iterable[FileInfo],
-            expected_file_count: int,
-            expected_size: int,
-            expected_prefix: str,
-    ) -> None:
-        """Verify: type, prefix, size and number of files."""
-        files_count = 0
-        for fi in file_infos:
-            assert isinstance(fi, FileInfo)
-            assert fi.path.startswith(expected_prefix)
-            assert fi.size == expected_size
-            files_count += 1
-        assert files_count == expected_file_count

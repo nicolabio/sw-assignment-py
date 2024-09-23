@@ -14,6 +14,7 @@ def config_environment_variables() -> dict[str, str]:
 
         ENV_PREFIX + "MODE": "1",
         ENV_PREFIX + "OUTPUT_PATH": "out.json",
+        ENV_PREFIX + "PREFIX": "my_prefix",
 
         # Minio config
         ENV_PREFIX + "MINIO_URL": "localhost:9000",
@@ -35,8 +36,6 @@ def empty_config_environment_variables() -> dict[str, str]:
         ENV_PREFIX + "MINIO_ACCESS_KEY": "",
         ENV_PREFIX + "MINIO_SECRET_KEY": "",
         ENV_PREFIX + "MINIO_DISABLE_SSL": "",
-
-
     }
 
 
@@ -89,6 +88,7 @@ def assert_valid_config(c: Config) -> None:
     assert c.debug
     assert c.mode == 1
     assert c.output_path == "out.json"
+    assert c.prefix == "my_prefix"
 
     # Minio config
     assert c.minio_url == "localhost:9000"

@@ -5,7 +5,7 @@ import pytest
 
 from sw_assignment.app import App
 from sw_assignment.config import Config, Mode
-from tests.helpers import write_same_data_to_files
+from tests.helpers import write_data_to_files
 
 
 @pytest.fixture
@@ -37,14 +37,14 @@ class TestApp:
             config: Config,
     ) -> None:
         # Seed the bucket with some files.
-        write_same_data_to_files(
+        write_data_to_files(
             minio_client=minio_client,
             bucket_name=config.minio_bucket,
             data=b"dummy",
             file_names_to_write=[
-                "file1",
-                "file2",
-                "file3",
+                "file1.dcm",
+                "file2.dcm",
+                "file3.txt",
             ],
         )
 
@@ -53,4 +53,4 @@ class TestApp:
 
         # Validate the output.
         assert out_file.readline() == \
-            """[{"path": "file1"}, {"path": "file2"}, {"path": "file3"}]"""
+            """[{"path": "file1.dcm"}, {"path": "file2.dcm"}, {"path": "file3.txt"}]"""

@@ -38,6 +38,7 @@ class App:
             raise ValueError(f"Unsupported mode: {self._config.mode}")
 
     def run(self) -> None:
+        iterator = self._storage.iter_file_infos(self._config.prefix)
         self._printer.print(
-            [PrintItem(f.path) for f in self._storage.iter_file_infos("")],
+            [PrintItem(f.path) for f in iterator],
         )

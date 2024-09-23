@@ -1,14 +1,19 @@
 from __future__ import annotations
 
 import tempfile
+import uuid
 from typing import Any, Generator
 
 import minio
 import pytest
 import testcontainers.minio
 
-import tests.helpers
 from sw_assignment import SUPPORTED_MINIO_IMAGE
+
+
+@pytest.fixture
+def data() -> bytes:
+    return b"dummy"
 
 
 @pytest.fixture
@@ -17,27 +22,27 @@ def out_file() -> Generator[Any, None, None]:
         yield temp_file
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 def bucket_name() -> str:
-    return tests.helpers.uuid4()
+    return uuid.uuid4().hex
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def minio_access_key() -> str:
     return "minio_access_key"
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def minio_secret_key() -> str:
     return "minio_secret_key"
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def minio_port() -> int:
     return 9000
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def minio_container(
         minio_access_key: str,
         minio_secret_key: str,

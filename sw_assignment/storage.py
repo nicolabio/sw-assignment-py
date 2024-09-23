@@ -56,12 +56,6 @@ class StorageReader:
                 different from the default Minio retryable errors. See:
                 RetryableError
         """
-        # This would be more performant if we pass the max-keys header to
-        # the list_objects call. That would allow tuning it to the number of
-        # files we need (min_files in list_file_infos, or some batch size).
-        # However, this seems not supported by the MinIO SDK. See:
-        # https://docs.aws.amazon.com/AmazonS3/latest/API/API_ListObjectsV2.html
-        # https://min.io/docs/minio/linux/developers/python/API.html#list_objects
         iterator = self._minio_client.list_objects(
             self._bucket_name,
             prefix=prefix,
