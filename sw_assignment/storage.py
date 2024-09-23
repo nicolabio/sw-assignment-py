@@ -31,9 +31,6 @@ class StorageReader:
          as FileInfo object.
 
         Raises:
-            RetryableError: if we consider the error retryable. This is
-                different from the default Minio retryable errors. See:
-                RetryableError
             NotFoundError: if less the min_files are present.
         """
         result: list[FileInfo] = []
@@ -49,13 +46,7 @@ class StorageReader:
         return result
 
     def iter_file_infos(self, prefix: str) -> Iterator[FileInfo]:
-        """Perform list_object call and return results as FileInfo object.
-
-        Raises:
-            RetryableError: if we consider the error retryable. This is
-                different from the default Minio retryable errors. See:
-                RetryableError
-        """
+        """Perform list_object call and return results as FileInfo object."""
         iterator = self._minio_client.list_objects(
             self._bucket_name,
             prefix=prefix,
