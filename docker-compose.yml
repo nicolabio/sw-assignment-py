@@ -37,15 +37,15 @@ services:
     depends_on:
       - minio
     environment:
-      EXTRACTOR_MINIO_URL: minio:9000
-      EXTRACTOR_MINIO_BUCKET: my-bucket
-      EXTRACTOR_MINIO_ACCESS_KEY: minioadmin
-      EXTRACTOR_MINIO_SECRET_KEY: minioadmin
-      EXTRACTOR_MINIO_DISABLE_SSL: "true"
-      EXTRACTOR_DEBUG: "true"
-      EXTRACTOR_MODE: "2"
-      EXTRACTOR_PREFIX: ""
-      EXTRACTOR_OUTPUT_PATH: "/app/out.json"
+      SW_ASSIGNMENT_MINIO_URL: minio:9000
+      SW_ASSIGNMENT_MINIO_BUCKET: my-bucket
+      SW_ASSIGNMENT_MINIO_ACCESS_KEY: minioadmin
+      SW_ASSIGNMENT_MINIO_SECRET_KEY: minioadmin
+      SW_ASSIGNMENT_MINIO_DISABLE_SSL: "true"
+      SW_ASSIGNMENT_DEBUG: "true"
+      SW_ASSIGNMENT_MODE: "2"
+      SW_ASSIGNMENT_PREFIX: ""
+      SW_ASSIGNMENT_OUTPUT_PATH: "/app/out.json"
     volumes:
       - .:/app
 
