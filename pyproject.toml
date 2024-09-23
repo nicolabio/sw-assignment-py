@@ -6,10 +6,11 @@ build-backend = "poetry.core.masonry.api"
 name = "sw_assignment"
 version = "0.0.0"
 description = "Print MinIO bucket contents"
+packages = [{include = "sw_assignment"}]
 authors = []
 
 [tool.poetry.dependencies]
-python = "3.9.18"
+python = "^3.9"
 
 minio = "*"
 pydantic = "^2.8.2"

@@ -1,23 +1,27 @@
-# Use the official Python image from the Docker Hub
-FROM python:3.9-slim
+# Use an official Python runtime as the base image
+FROM python:3.9.18-bookworm
 
-# Install Poetry
-RUN pip install poetry
+# Set environment variables
+ENV PATH=$PATH:/root/.local/bin
 
 # Set the working directory in the container
 WORKDIR /app
 
-# Copy the pyproject.toml and poetry.lock files
-COPY pyproject.toml poetry.lock* /app/
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
 
-# Install dependencies
-RUN poetry install --no-root
+# Install Poetry
+RUN curl -sSL https://install.python-poetry.org | python3 -
 
-# Copy the rest of the application code
-COPY . /app
+# Copy the entire project
+COPY . .
 
-# Make port 5000 available to the world outside this container
-EXPOSE 5000
+# Install project dependencies
+RUN poetry config virtualenvs.create false \
+    && poetry install --only main --no-interaction --no-ansi
 
 # Run the application
-CMD ["poetry", "run", "python", "main.py"]
+CMD ["python", "-m", "sw_assignment"]

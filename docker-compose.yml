@@ -31,19 +31,23 @@ services:
 
   python_app:
     build:
-      context: ./app
+      context: .
       dockerfile: Dockerfile
     container_name: python_app
     depends_on:
       - minio
     environment:
-      MINIO_ENDPOINT: http://minio:9000
-      MINIO_ACCESS_KEY: minioadmin
-      MINIO_SECRET_KEY: minioadmin
-    ports:
-      - "5000:5000"
+      EXTRACTOR_MINIO_URL: minio:9000
+      EXTRACTOR_MINIO_BUCKET: my-bucket
+      EXTRACTOR_MINIO_ACCESS_KEY: minioadmin
+      EXTRACTOR_MINIO_SECRET_KEY: minioadmin
+      EXTRACTOR_MINIO_DISABLE_SSL: "true"
+      EXTRACTOR_DEBUG: "true"
+      EXTRACTOR_MODE: "2"
+      EXTRACTOR_PREFIX: ""
+      EXTRACTOR_OUTPUT_PATH: "/app/out.json"
     volumes:
-      - ./app:/app
+      - .:/app
 
 volumes:
   minio_data:

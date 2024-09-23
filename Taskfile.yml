@@ -166,8 +166,25 @@ tasks:
       - task: pytest
 
   ### Build procedure
-  # TODO ILIAS
-  # build:
+  build:
+    desc: "build docker image"
+    cmds:
+      - docker build -t {{.PACKAGE_NAME}} .
+
+  run:
+    desc: "run docker compose"
+    cmds:
+      - docker compose up -d --build
+
+  logs:
+    desc: "show docker logs for the Python app"
+    cmds:
+      - docker compose logs -f python_app
+
+  down:
+    desc: "down docker compose"
+    cmds:
+      - docker compose down
 
 
   all:
@@ -176,3 +193,6 @@ tasks:
       - task: format
       - task: lint
       - task: test
+      - task: build
+      - task: run
+      - task: logs
