@@ -27,6 +27,9 @@ class Config(BaseSettings):
     # Files are filtered by this prefix.
     prefix: str = Field(default="")
 
+    # Files are filtered by this suffix.
+    suffix_filter: str = Field(default="")
+
     # Output path.
     #
     # Only used when mode is JSON.

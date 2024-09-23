@@ -5,6 +5,7 @@ import json
 @dataclasses.dataclass
 class PrintItem:
     path: str
+    suffix: str
 
 
 class Printer:
@@ -24,4 +25,4 @@ class JsonPrinter(Printer):
 class StdOutPrinter(Printer):
     def print(self, items: list[PrintItem]) -> None:
         for item in items:
-            print(f"{item.path}")
+            print(f"path: {item.path}, suffix: {item.suffix}")

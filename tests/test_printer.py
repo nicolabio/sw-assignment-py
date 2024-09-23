@@ -11,18 +11,18 @@ class TestJSONPrinter:
         assert got == "[]"
 
     def test_print__single_item(self, out_file: Any) -> None:
-        JsonPrinter(out_file.name).print([PrintItem(path="path")])
+        JsonPrinter(out_file.name).print([PrintItem(path="path", suffix=".dcm")])
 
         got = out_file.readlines()
         assert len(got) == 1
-        assert got[0] == '[{"path": "path"}]'
+        assert got[0] == '[{"path": "path", "suffix": ".dcm"}]'
 
     def test_print__multiple_items(self, out_file: Any) -> None:
         JsonPrinter(out_file.name).print([
-            PrintItem(path="path1"),
-            PrintItem(path="path2"),
+            PrintItem(path="path1", suffix=".dcm"),
+            PrintItem(path="path2", suffix=".dcm"),
         ])
 
         got = out_file.readlines()
         assert len(got) == 1
-        assert got[0] == '[{"path": "path1"}, {"path": "path2"}]'
+        assert got[0] == '[{"path": "path1", "suffix": ".dcm"}, {"path": "path2", "suffix": ".dcm"}]'

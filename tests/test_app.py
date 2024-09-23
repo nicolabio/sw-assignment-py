@@ -53,4 +53,31 @@ class TestApp:
 
         # Validate the output.
         assert out_file.readline() == \
-            """[{"path": "file1.dcm"}, {"path": "file2.dcm"}, {"path": "file3.txt"}]"""
+            """[{"path": "file1.dcm", "suffix": ".dcm"}, {"path": "file2.dcm", "suffix": ".dcm"},""" \
+            """ {"path": "file3.txt", "suffix": ".txt"}]"""
+
+    def test_run__with_suffix_filter(
+            self,
+            minio_client: minio.Minio,
+            out_file: Any,
+            config: Config,
+    ) -> None:
+        # Seed the bucket with some files.
+        write_data_to_files(
+            minio_client=minio_client,
+            bucket_name=config.minio_bucket,
+            data=b"dummy",
+            file_names_to_write=[
+                "file1.dcm",
+                "file2.dcm",
+                "file3.txt",
+            ],
+        )
+
+        # Run the app.
+        config.suffix_filter = ".dcm"
+        App(config).run()
+
+        # Validate the output.
+        assert out_file.readline() == \
+            """[{"path": "file1.dcm", "suffix": ".dcm"}, {"path": "file2.dcm", "suffix": ".dcm"}]"""
