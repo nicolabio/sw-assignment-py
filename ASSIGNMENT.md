@@ -17,5 +17,6 @@ Let's say that a DICOM folder is defined as:
 You may assume that the bucket only contains folders, and that these folders
 only contain files (no nested folders). 
 
-3. Change the code such that only the files inside dicom folders are printed. 
-You don't have to write tests for this feature.
+4. Change the code such that only the files inside dicom folders are printed. 
+You don't have to write tests for this feature. And you don't need to add an 
+environment variable for this feature.
