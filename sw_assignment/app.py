@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import minio
+from pathlib import Path
 
 from sw_assignment.config import Config, Mode
 from sw_assignment.printer import (
@@ -9,7 +10,7 @@ from sw_assignment.printer import (
     PrintItem,
     StdOutPrinter,
 )
-from sw_assignment.storage import StorageReader
+from sw_assignment.storage import StorageReader, NotFoundError
 
 
 class App:
@@ -38,10 +39,50 @@ class App:
             raise ValueError(f"Unsupported mode: {self._config.mode}")
 
     def run(self) -> None:
-        iterator = self._storage.iter_file_infos(
+        base_iterator = self._storage.iter_file_infos(
             self._config.prefix,
             self._config.suffix_filter,
         )
-        self._printer.print(
-            [PrintItem(f.path, suffix=f.suffix) for f in iterator],
-        )
+
+        processed_parents = []
+
+        for file_info in base_iterator:
+
+            parent = Path(file_info.path).parent
+
+            if not parent:
+                AssertionError(
+                    "We were allowed to assume that each files is in a folder",
+                )
+
+            if parent.parent:
+                AssertionError(
+                    "We were allowed to assume there a not nested files.",
+                )
+
+            if parent in processed_parents:
+                continue
+
+            try:
+                # We want at least one txt file. Max files is set to 1 to avoid unnecessary reads.
+                txt_files = self._storage.list_file_infos(str(parent), min_files=1, max_files=1, suffix_filter=".txt")
+            except NotFoundError:
+                continue
+
+            if len(txt_files) <= 1:
+                continue
+
+            try:
+                # We want at least two dcm files. No max files set to read all dcm files.
+                dcm_files = self._storage.list_file_infos(str(parent), min_files=2, suffix_filter=".dcm")
+            except NotFoundError:
+                continue
+
+            # Combine the txt and dcm files.
+            all_files = txt_files + dcm_files
+
+            self._printer.print(
+                [PrintItem(f.path, suffix=f.suffix) for f in all_files],
+            )
+
+            processed_parents.append(parent)
