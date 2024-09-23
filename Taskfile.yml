@@ -1,0 +1,178 @@
+---
+version: '3'
+
+vars:
+  PACKAGE_NAME: sw_assignment
+
+tasks:
+  poetry-init:
+    cmds:
+      # Install poetry if not installed.
+      - which poetry || pipx install poetry
+
+  install:
+    desc: "setup poetry for all"
+    deps:
+      - poetry-init
+    cmds:
+      - poetry install --sync
+
+  install:format:
+    desc: "setup poetry for formatting"
+    deps:
+      - poetry-init
+    cmds:
+      - poetry install --sync --with format
+
+  install:lint:
+    desc: "setup poetry for linting"
+    deps:
+      - poetry-init
+    cmds:
+      - poetry install --sync --with lint
+
+  install:test:
+    desc: "setup poetry for testing"
+    deps:
+      - poetry-init
+    cmds:
+      - poetry install --sync --with test
+
+  lock:
+    desc: "generate lockfile"
+    deps:
+      - poetry-init
+    cmds:
+      - poetry lock --no-cache
+
+  ### Linters
+  autopep8:check:
+    desc: "check if code is formatted with autopep8"
+    deps:
+      - install:lint
+    cmds:
+      - |
+        poetry run autopep8 {{.CLI_ARGS}} --exit-code . || {
+          echo "Error: Code is not formatted with autopep8.";
+          echo "Please run 'task autopep8' to format the code.";
+          exit 1;
+        }
+    # Otherwise the whole command is printend which makes it look like the
+    # error has occurred.
+    silent: true
+
+  bandit:
+    desc: "lint Python code for security issues"
+    deps:
+      - install:lint
+    cmds:
+      - poetry run bandit {{.CLI_ARGS}} --configfile pyproject.toml --quiet -r .
+
+  flake8:
+    desc: "lint Python code"
+    deps:
+      - install:lint
+    cmds:
+      - poetry run flake8 {{.CLI_ARGS}} .
+
+  isort:check:
+    desc: "check if imports are sorted"
+    deps:
+      - install:lint
+    cmds:
+      - poetry run isort {{.CLI_ARGS}} --check .
+
+  mypy:
+    desc: "lint Python code"
+    deps:
+      - install:lint
+    cmds:
+      - poetry run mypy {{.CLI_ARGS}} .
+
+  unify:check:
+    desc: "lint unify, check quotes"
+    deps:
+      - install:lint
+    cmds:
+      - poetry run unify --check-only --quote='"' -r {{.PACKAGE_NAME}}
+      - poetry run unify --check-only --quote='"' -r ./tests
+
+  yamllint:
+    desc: "lint yaml code"
+    deps:
+      - install:lint
+    cmds:
+      - poetry run yamllint {{.CLI_ARGS}} .
+
+  lint:
+    desc: "run all linters"
+    cmds:
+      - task: autopep8:check
+      - task: bandit
+      - task: flake8
+      - task: isort:check
+      - task: mypy
+      - task: unify:check
+      - task: yamllint
+
+  ### Formatters
+  autopep8:run:
+    desc: "format Python code"
+    deps:
+      - install:format
+    cmds:
+      - poetry run autopep8 {{.CLI_ARGS}} .
+
+  isort:run:
+    desc: "sort imports"
+    deps:
+      - install:format
+    cmds:
+      - poetry run isort {{.CLI_ARGS}} .
+
+  unify:run:
+    desc: "run unify, adjust to double quotes"
+    deps:
+      - install:format
+    cmds:
+      - poetry run unify --quote='"' -i -r {{.PACKAGE_NAME}}
+      - poetry run unify --quote='"' -i -r ./tests
+
+  format:
+    desc: "run all formatters"
+    cmds:
+      - task: autopep8:run
+      - task: isort:run
+      - task: unify:run
+
+  ### Test
+  pytest:
+    desc: "run Python tests"
+    deps:
+      - install:test
+    cmds:
+      - poetry run pytest --doctest-modules . {{.CLI_ARGS}}
+
+  doctest:readme:
+    desc: "run doctest in README.md"
+    deps:
+      - install:test
+    cmds:
+      - poetry run python -m doctest README.md {{.CLI_ARGS}}
+
+  test:
+    desc: "run all tests"
+    cmds:
+      - task: pytest
+
+  ### Build procedure
+  # TODO ILIAS
+  # build:
+
+
+  all:
+    desc: "run all tasks"
+    cmds:
+      - task: format
+      - task: lint
+      - task: test
