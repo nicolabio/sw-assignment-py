@@ -2,8 +2,12 @@
 1. Verify project. See README.md for more details.  
 
 2. Next, we want to improve this tool by adding a filter to print files of a 
-certain type (suffix). For example, to only print .dcm files. Add this feature
-to the code. 
+certain type (suffix). For example, to only print .dcm files.
+* Add a suffix filter to the configuration / environment variables.
+* Use this filter the suffix of the files. 
+* Include in the output (StdoutPrinter and the JsonPrinter) the suffix as an 
+explicit field/column. 
+* Make sure to add tests for this feature.
 
 3. TODO(ILIAS): Some devopsish task.
 
