@@ -1,0 +1,79 @@
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "sw_assignment"
+version = "0.0.0"
+description = "Print MinIO bucket contents"
+authors = []
+
+[tool.poetry.dependencies]
+python = "3.9.18"
+
+minio = "*"
+pydantic = "^2.8.2"
+pydantic-settings = "*"
+
+
+[tool.poetry.group.lint.dependencies]
+bandit = { version = "*", extras = ["toml"] }
+flake8 = "*"
+flake8-commas = "*"
+flake8-bugbear = "*"
+isort = "*"
+mypy = { version = ">=1.8.0" }                # Config below breaks with older versions.
+unify = "*"
+yamllint = "*"
+
+[tool.poetry.group.format.dependencies]
+autopep8 = "*"
+isort = "*"
+unify = "*"
+
+[tool.poetry.group.test.dependencies]
+httpx = "*"
+pytest = { version = ">=7.1.2" }
+pytest-asyncio = { version = "^0.15.1" }                        # pin as our tests were breaking with the latest version.
+pytest-xdist = "*"
+tomli = "*"
+testcontainers = { version = "4.0.0", extras = ["minio"] }
+
+
+[tool.autopep8]
+# To exclude more you can use comma separated list as string value.
+exclude = ".venv"
+max-line-length = 120
+recursive = true
+in-place = true
+
+[tool.bandit]
+skips = ["B101", "B404", "B603"]
+exclude_dirs = [
+  ".git",
+  ".venv",
+  ".vscode",
+  "mypy_cache",
+  "pytest_cache",
+  "tests",        # Makes heavy use of assert
+]
+
+[tool.isort]
+profile = "django"
+lines_after_imports = 2
+multi_line_output = 3
+skip = [".ipynb_checkpoints", ".mypy_cache", ".pytest_cache", ".venv"]
+
+[tool.mypy]
+plugins = "pydantic.mypy"
+ignore_missing_imports = true
+follow_imports = "silent"
+show_error_codes = true
+strict_equality = true
+warn_redundant_casts = true
+warn_unreachable = true
+warn_unused_ignores = true
+disallow_untyped_defs = true
+
+[tool.pytest.ini_options]
+addopts = "-n auto"
