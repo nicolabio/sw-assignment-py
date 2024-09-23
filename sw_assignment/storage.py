@@ -1,4 +1,5 @@
 import dataclasses
+from pathlib import Path
 from typing import Iterator, Optional
 
 import minio
@@ -8,6 +9,7 @@ import minio
 class FileInfo:
     path: str
     size: int
+    suffix: str
 
 
 class StorageReader:
@@ -26,6 +28,7 @@ class StorageReader:
             prefix: str,
             min_files: Optional[int] = None,
             max_files: Optional[int] = None,
+            suffix_filter: Optional[str] = None,
     ) -> list[FileInfo]:
         """Perform list_object call, iterate over all results and return results
          as FileInfo object.
@@ -35,7 +38,7 @@ class StorageReader:
         """
         result: list[FileInfo] = []
         try:
-            iterator = self.iter_file_infos(prefix)
+            iterator = self.iter_file_infos(prefix, suffix_filter)
             while True:
                 if max_files and len(result) == max_files:
                     return result
@@ -45,7 +48,7 @@ class StorageReader:
                 raise NotFoundError(f"Not found the minimum of {min_files} min_files.")
         return result
 
-    def iter_file_infos(self, prefix: str) -> Iterator[FileInfo]:
+    def iter_file_infos(self, prefix: str, suffix_filter: Optional[str] = None) -> Iterator[FileInfo]:
         """Perform list_object call and return results as FileInfo object."""
         iterator = self._minio_client.list_objects(
             self._bucket_name,
@@ -53,7 +56,10 @@ class StorageReader:
             recursive=True,
         )
         for obj in iterator:
-            yield FileInfo(path=obj.object_name, size=obj.size)
+            if suffix_filter:
+                if Path(obj.object_name).suffix != suffix_filter:
+                    continue
+            yield FileInfo(path=obj.object_name, size=obj.size, suffix=Path(obj.object_name).suffix)
 
 
 class NotFoundError(Exception):
