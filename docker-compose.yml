@@ -25,9 +25,11 @@ services:
         mc alias set myminio http://minio:9000 minioadmin minioadmin;
         mc mb myminio/my-bucket;
         mc cp -r /data/* myminio/my-bucket;
+        echo 'MC setup complete' > /tmp/mc_done
       "
     volumes:
       - ./minio_data:/data
+      - ./tmp:/tmp
 
   python_app:
     build:
@@ -36,6 +38,15 @@ services:
     container_name: python_app
     depends_on:
       - mc
+    entrypoint: >
+      /bin/sh -c "
+        while [ ! -f /tmp/mc_done ]; do
+          echo 'Waiting for MC to complete...'
+          sleep 10
+        done
+        echo 'MC setup complete. Starting Python app...'
+        python -m sw_assignment
+      "
     environment:
       SW_ASSIGNMENT_MINIO_URL: minio:9000
       SW_ASSIGNMENT_MINIO_BUCKET: my-bucket
@@ -48,6 +59,7 @@ services:
       SW_ASSIGNMENT_OUTPUT_PATH: "/app/out.json"
     volumes:
       - .:/app
+      - ./tmp:/tmp
 
 volumes:
   minio_data:
