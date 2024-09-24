@@ -171,7 +171,7 @@ tasks:
     cmds:
       - docker build -t {{.PACKAGE_NAME}} .
 
-  run:
+  up:
     desc: "run docker compose"
     cmds:
       - docker compose up -d --build
@@ -182,10 +182,9 @@ tasks:
       - docker compose logs -f python_app
 
   down:
-    desc: "down docker compose"
+    desc: "down docker compose and remove files and volumes"
     cmds:
-      - docker compose down
-
+      - docker compose down --volumes --remove-orphans
 
   all:
     desc: "run all tasks"
@@ -194,6 +193,21 @@ tasks:
       - task: lint
       - task: test
       - task: build
-      - task: run
+      - task: up
+      - task: logs
+      - task: down
+
+  dev:
+    desc: "run all tasks for development"
+    cmds:
+      - task: format
+      - task: lint
+      - task: test
+
+
+  run:
+    desc: "run all tasks for running the app"
+    cmds:
+      - task: up
       - task: logs
       - task: down
