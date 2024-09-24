@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-import minio
 from pathlib import Path
+
+import minio
 
 from sw_assignment.config import Config, Mode
 from sw_assignment.printer import (
@@ -10,7 +11,7 @@ from sw_assignment.printer import (
     PrintItem,
     StdOutPrinter,
 )
-from sw_assignment.storage import StorageReader, NotFoundError
+from sw_assignment.storage import NotFoundError, StorageReader
 
 
 class App:
