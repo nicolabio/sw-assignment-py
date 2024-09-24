@@ -36,7 +36,6 @@ This project sets up a Python application with MinIO using Docker Compose. The P
 - `docker-compose.yml`: Docker Compose configuration
 - `Taskfile.yml`: Task runner configuration
 - `pyproject.toml`: Poetry project configuration
-- `ASSIGNMENT.md`: Project assignment details
 
 ## Assignment Tasks
 
@@ -61,7 +60,7 @@ This project sets up a Python application with MinIO using Docker Compose. The P
 To run the application:
 
 ```sh
-task run
+task up
 ```
 
 To view the logs:
@@ -76,10 +75,17 @@ To stop the application:
 task down
 ```
 
+To run all together:
+
+```sh
+task run
+```
+
 ## Development
 
 - Use `task format` to run all formatters
 - Use `task lint` to run all linters
 - Use `task test` to run all tests
+- Use `task dev` to run the formatters, linters, and tests
 
 For more detailed task information, refer to the `Taskfile.yml`.
