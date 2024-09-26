@@ -4,8 +4,11 @@ The project contains a bucket printer. It prints items in the MiNIO bucket.
 There are two types of printers: StdoutPrinter and JsonPrinter. The environment 
 variable `SW_ASSIGNMENT_MODE` is to set the printer type.
 
-This project sets up a Python application with MinIO using Docker Compose. 
 The Python application uses Poetry for dependency management.
+
+This project sets up a Python application with MinIO using Docker Compose. The 
+files in `minio_data` are mounted to the MinIO container. See the `docker-compose.yml`. 
+
 
 ## Prerequisites
 
