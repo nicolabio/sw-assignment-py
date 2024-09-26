@@ -64,25 +64,6 @@ install_pipx() {
     fi
 }
 
-# Function to install Poetry
-install_poetry() {
-    if ! command_exists poetry; then
-        echo "Installing Poetry..."
-        curl -sSL https://install.python-poetry.org | python3.9 -
-    else
-        echo "Poetry is already installed"
-    fi
-}
-
-# Function to activate an environment with poetry
-activate_poetry_environment() {
-    if ! command_exists poetry; then
-        echo "Poetry is not installed. Please install Poetry first."
-        exit 1
-    fi
-    poetry env use 3.9.18
-    poetry install
-}
 
 # Main installation process
 echo "Starting installation process..."
@@ -90,7 +71,5 @@ echo "Starting installation process..."
 install_python
 install_taskfile
 install_pipx
-install_poetry
-activate_poetry_environment
 
 echo "Installation complete!"
