@@ -184,6 +184,7 @@ tasks:
   down:
     desc: "down docker compose and remove files and volumes"
     cmds:
+      - rm -rf ./tmp # please for god's sake don't remove the . in the path.
       - docker compose down --volumes --remove-orphans
 
   all:
